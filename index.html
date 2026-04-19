@@ -4,47 +4,93 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PL/SQL Unwrap Tool Online | UnwrapPLSQL</title>
-<meta name="description" content="Analyze and decode Oracle wrapped PL/SQL code online. Fast, free and secure.">
-<meta name="keywords" content="plsql unwrap, oracle wrapped code, decode plsql, plsql analyzer, unwrap plsql online">
+<meta name="description" content="Analyze and fully unwrap Oracle wrapped PL/SQL code online. Supports 10g, 11g, 12c, and newer. Free, fast, and secure — runs entirely in your browser.">
+<meta name="keywords" content="plsql unwrap, oracle wrapped code, decode plsql, plsql analyzer, unwrap plsql online, oracle wrap decoder, plsql unwrapper">
 <meta name="author" content="UnwrapPLSQL">
 <meta name="robots" content="index, follow">
-<link rel="canonical" href="https://unwrapplsql.vercel.app">
-<meta property="og:title" content="UnwrapPLSQL - Analyze Wrapped Oracle Code">
-<meta property="og:description" content="Free online tool to analyze and decode wrapped PL/SQL code.">
+<link rel="canonical" href="https://unwrapplsql.netlify.app/">
+<meta property="og:title" content="UnwrapPLSQL - Unwrap Oracle PL/SQL Online">
+<meta property="og:description" content="Free online tool to analyze and fully unwrap Oracle wrapped PL/SQL code. Supports 10g+.">
 <meta property="og:type" content="website">
+<meta property="og:url" content="https://unwrapplsql.netlify.app/">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="UnwrapPLSQL">
+<meta name="twitter:description" content="Analyze and unwrap Oracle PL/SQL code online.">
+
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
 <link href="styles.css" rel="stylesheet">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔓</text></svg>">
+
+<!-- JSON-LD FAQ Schema for Tool Page -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "UnwrapPLSQL",
+  "description": "Analyze and fully unwrap Oracle wrapped PL/SQL code online. Supports 10g and later.",
+  "url": "https://unwrapplsql.netlify.app/",
+  "applicationCategory": "DeveloperTool",
+  "operatingSystem": "All",
+  "offers": {
+    "@type": "Offer",
+    "price": "0",
+    "priceCurrency": "USD"
+  },
+  "featureList": [
+    "Full 10g+ unwrap algorithm",
+    "Version detection",
+    "Pattern extraction fallback",
+    "Client-side processing"
+  ]
+}
+</script>
+
+<!-- Optional: Google Analytics (replace G-XXXXXXXXXX with your ID later) -->
+<!--
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XXXXXXXXXX');
+</script>
+-->
 </head>
+
 <body class="bg-gray-950 text-white min-h-screen">
+
+<!-- NAVIGATION -->
 <header class="p-4 border-b border-gray-800">
   <div class="max-w-6xl mx-auto flex justify-between items-center">
     <h1 class="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">UnwrapPLSQL</h1>
     <div class="flex gap-4">
-      <a href="seo/plsql-guide.html" class="text-gray-400 hover:text-white text-sm">Guide</a>
+      <a href="seo/plsql-guide.html" class="text-gray-400 hover:text-white text-sm">📘 PL/SQL Guide</a>
       <button onclick="toggleTheme()" id="themeToggle" class="text-sm bg-gray-800 px-3 py-1 rounded-full">🌙 Dark</button>
     </div>
   </div>
 </header>
 
+<!-- HERO -->
 <main class="max-w-6xl mx-auto">
   <section class="text-center py-12 px-4">
-    <h2 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Analyze & Decode Wrapped PL/SQL</h2>
-    <p class="text-gray-400 text-lg max-w-2xl mx-auto">Paste your Oracle wrapped PL/SQL code below. We'll analyze the wrap pattern and attempt to extract readable content.</p>
+    <h2 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">Analyze & Unwrap Wrapped PL/SQL</h2>
+    <p class="text-gray-400 text-lg max-w-2xl mx-auto">Paste your Oracle wrapped PL/SQL code below. Our tool uses the public 10g+ unwrap algorithm to recover the full original source.</p>
   </section>
 
+  <!-- TOOL SECTION -->
   <section class="px-4 pb-8">
     <div class="bg-gray-900 rounded-xl border border-gray-800 p-6 shadow-2xl">
       <div class="mb-2 flex justify-between">
-        <label class="text-sm text-gray-400">Input (Paste wrapped PL/SQL)</label>
-        <button onclick="pasteExample()" class="text-xs text-blue-400 hover:text-blue-300">Try example</button>
+        <label class="text-sm text-gray-400">📥 Input (Paste wrapped PL/SQL)</label>
+        <button onclick="pasteExample()" class="text-xs text-blue-400 hover:text-blue-300">✨ Try example</button>
       </div>
       <textarea id="input" class="w-full h-56 p-4 bg-gray-950 rounded-lg border border-gray-700 font-mono text-sm focus:border-blue-500 focus:outline-none resize-y" placeholder="Paste wrapped PL/SQL code here...&#10;Example: CREATE OR REPLACE PACKAGE BODY wrapped&#10;abcdefghijklmnopqrstuvwxyz..."></textarea>
       
       <div class="flex flex-wrap gap-3 mt-5">
         <button onclick="analyze()" class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-2.5 rounded-lg font-medium transition shadow-lg flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-          Analyze Code
+          Analyze & Unwrap
         </button>
         <button onclick="clearAll()" class="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded-lg font-medium transition flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
@@ -57,11 +103,12 @@
       </div>
 
       <div class="mt-5">
-        <label class="text-sm text-gray-400 block mb-2">Analysis Output</label>
-        <textarea id="output" class="w-full h-56 p-4 bg-gray-950 rounded-lg border border-gray-700 font-mono text-sm focus:border-blue-500 focus:outline-none resize-y" placeholder="Decoded content and analysis will appear here..." readonly></textarea>
+        <label class="text-sm text-gray-400 block mb-2">📤 Unwrapped Output</label>
+        <textarea id="output" class="w-full h-56 p-4 bg-gray-950 rounded-lg border border-gray-700 font-mono text-sm focus:border-blue-500 focus:outline-none resize-y" placeholder="Decoded content will appear here..." readonly></textarea>
       </div>
     </div>
 
+    <!-- ANALYTICS CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mt-6">
       <div class="card">
         <span class="block text-xs text-gray-400 uppercase tracking-wider mb-1">Detection</span>
@@ -81,14 +128,16 @@
       </div>
     </div>
 
+    <!-- INFO NOTICE -->
     <div class="mt-6 p-4 bg-blue-950/30 border border-blue-900/50 rounded-lg">
       <p class="text-sm text-blue-300 flex items-start gap-2">
         <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-        <span><strong>Important:</strong> Oracle's wrap utility is a one-way obfuscation. This tool analyzes wrap patterns and extracts readable fragments where possible. Full "unwrapping" is not possible with official Oracle wrap.</span>
+        <span><strong>Important:</strong> This tool uses the public 10g+ unwrap algorithm. For 9i wraps, only partial extraction is possible. All processing happens in your browser — no code is sent to any server.</span>
       </p>
     </div>
   </section>
 
+  <!-- HOW IT WORKS -->
   <section class="px-4 pb-12 border-t border-gray-800 pt-8 mt-4">
     <h3 class="text-xl font-semibold mb-4">How It Works</h3>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -99,8 +148,8 @@
       </div>
       <div class="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
         <div class="text-2xl mb-2">⚙️</div>
-        <h4 class="font-medium mb-1">2. Multi-Strategy Decode</h4>
-        <p class="text-sm text-gray-400">Applies Base64 decode, hex analysis, and pattern extraction to recover readable content</p>
+        <h4 class="font-medium mb-1">2. Full Unwrap Algorithm</h4>
+        <p class="text-sm text-gray-400">Applies Base64 decode, reverse substitution, and LZ decompression to recover the original source</p>
       </div>
       <div class="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
         <div class="text-2xl mb-2">📊</div>
@@ -111,14 +160,15 @@
   </section>
 </main>
 
+<!-- FOOTER (Broken Links Fixed) -->
 <footer class="border-t border-gray-800 py-6 px-4 text-center text-gray-500 text-sm">
   <p>© 2024 UnwrapPLSQL — Analyze wrapped Oracle PL/SQL code online. For educational and recovery purposes only.</p>
-  <div class="mt-3 space-x-4">
-    <a href="seo/plsql-guide.html" class="hover:text-gray-300">PL/SQL Guide</a>
-    <a href="#" class="hover:text-gray-300">Privacy</a>
-    <a href="#" class="hover:text-gray-300">Contact</a>
+  <div class="mt-3">
+    <a href="seo/plsql-guide.html" class="hover:text-gray-300">📖 PL/SQL Unwrap Guide</a>
   </div>
 </footer>
+
+<!-- Required Libraries -->
 <script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
 <script src="app.js"></script>
 </body>
