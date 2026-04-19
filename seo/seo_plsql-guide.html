@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What is Wrapped PL/SQL? Complete Guide | UnwrapPLSQL</title>
+<meta name="description" content="Learn everything about Oracle wrapped PL/SQL code: what it is, why it's used, how wrapping works, and what can (and can't) be recovered.">
+<meta name="keywords" content="oracle wrapped pl/sql, plsql wrap, unwrap plsql, decode oracle wrap, wrap utility oracle">
+<link rel="canonical" href="https://unwrapplsql.vercel.app/seo/plsql-guide.html">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; }
+  .prose { max-width: 65ch; }
+</style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+<header class="bg-white border-b py-4">
+  <div class="max-w-4xl mx-auto px-4">
+    <a href="../index.html" class="text-blue-600 hover:text-blue-800">← Back to Tool</a>
+    <h1 class="text-3xl font-bold mt-4">What is Wrapped PL/SQL?</h1>
+    <p class="text-gray-600 mt-2">A complete guide to Oracle's PL/SQL wrap utility</p>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 py-8 prose">
+  <article>
+    <h2>Understanding Oracle PL/SQL Wrapping</h2>
+    
+    <p>Oracle PL/SQL wrapping (also called obfuscation) is a security feature that converts readable PL/SQL source code into an encoded format that cannot be easily understood by humans. When you "wrap" PL/SQL code, Oracle transforms it using the <code>wrap</code> utility or the <code>DBMS_DDL.WRAP</code> procedure.</p>
+
+    <h3>Why Wrap PL/SQL Code?</h3>
+    <ul>
+      <li><strong>Intellectual Property Protection:</strong> Prevent competitors from viewing proprietary business logic</li>
+      <li><strong>Security Through Obscurity:</strong> Hide sensitive implementation details (passwords, encryption keys, table structures)</li>
+      <li><strong>Deployment Requirements:</strong> Some third-party vendors require wrapped code for licensing compliance</li>
+      <li><strong>Accidental Modification Prevention:</strong> Discourage unintended changes to critical code</li>
+    </ul>
+
+    <h3>How Oracle Wrap Works</h3>
+    <p>The wrap utility performs a one-way encoding (not encryption) of your PL/SQL source:</p>
+    <ol>
+      <li>Tokenizes the PL/SQL source code</li>
+      <li>Applies a Base64-like encoding algorithm</li>
+      <li>Adds a header indicating "wrapped" status</li>
+      <li>Outputs obfuscated code that Oracle can still compile</li>
+    </ol>
+
+    <div class="bg-gray-100 p-4 rounded-lg my-6">
+      <h4 class="mt-0">Example: Before and After Wrapping</h4>
+      <p><strong>Original PL/SQL:</strong></p>
+      <pre class="bg-gray-800 text-gray-100 p-3 rounded"><code>CREATE OR REPLACE PROCEDURE hello_world AS
+BEGIN
+  DBMS_OUTPUT.PUT_LINE('Hello World!');
+END hello_world;</code></pre>
+      
+      <p><strong>Wrapped Output:</strong></p>
+      <pre class="bg-gray-800 text-gray-100 p-3 rounded text-sm"><code>CREATE OR REPLACE PROCEDURE hello_world wrapped 
+a000000
+369
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+abcd
+7
+4e 8e
+gH3k3xYD5Q3h0S6hZgJW8B+9Vv8wgxDJ2fIGyC9NCL8Y...</code></pre>
+    </div>
+
+    <h2>Can Wrapped Code Be Unwrapped?</h2>
+    
+    <p><strong>The short answer:</strong> No, not completely. Oracle's wrap utility is designed as a one-way transformation.</p>
+
+    <h3>Why Full Recovery Isn't Possible</h3>
+    <ul>
+      <li>The wrapping process discards original formatting and comments</li>
+      <li>Variable names are lost or replaced with generic identifiers</li>
+      <li>The encoding is lossy—some information is permanently removed</li>
+      <li>Oracle does not provide an official "unwrap" utility</li>
+    </ul>
+
+    <h3>What CAN Be Recovered?</h3>
+    <p>While full source recovery isn't possible, some information can be extracted:</p>
+    <ul>
+      <li><strong>Package/Procedure/Function Names:</strong> Often visible in the header</li>
+      <li><strong>String Literals:</strong> Hard-coded text values may survive</li>
+      <li><strong>PL/SQL Keywords:</strong> Some may be recognizable in the encoded output</li>
+      <li><strong>Structure Clues:</strong> Approximate size and complexity of the original code</li>
+    </ul>
+
+    <h3>Oracle Wrap Versions</h3>
+    <table class="w-full border-collapse my-4">
+      <thead>
+        <tr class="bg-gray-100">
+          <th class="border p-2">Oracle Version</th>
+          <th class="border p-2">Wrap Characteristics</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="border p-2">Oracle 9i</td><td class="border p-2">Simple hex encoding, easier to partially decode</td></tr>
+        <tr><td class="border p-2">Oracle 10g</td><td class="border p-2">Base64 encoding, more obfuscated</td></tr>
+        <tr><td class="border p-2">Oracle 11g+</td><td class="border p-2">Enhanced algorithm with SHA-1 hashing</td></tr>
+        <tr><td class="border p-2">Oracle 12c+</td><td class="border p-2">Continued improvements to obfuscation strength</td></tr>
+      </tbody>
+    </table>
+
+    <h2>How This Tool Helps</h2>
+    <p>The UnwrapPLSQL analyzer provides valuable insights into wrapped code:</p>
+    <ul>
+      <li><strong>Detection:</strong> Identifies if code is Oracle-wrapped and which version</li>
+      <li><strong>Safe Decoding:</strong> Attempts multiple strategies to extract readable content</li>
+      <li><strong>Pattern Analysis:</strong> Reveals structure and potential contents</li>
+      <li><strong>Educational Value:</strong> Understand how Oracle wrap works</li>
+    </ul>
+
+    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg my-6">
+      <h4 class="text-blue-800 mt-0">⚠️ Important Disclaimer</h4>
+      <p class="text-blue-800">This tool is for educational and legitimate recovery purposes only. Do not use it to attempt to reverse-engineer proprietary code you don't own or have permission to analyze. Respect intellectual property rights.</p>
+    </div>
+
+    <h2>Alternatives to Wrapping</h2>
+    <p>If you need stronger protection, consider these alternatives:</p>
+    <ul>
+      <li><strong>PL/SQL Native Compilation:</strong> Compiles to machine code (harder to reverse)</li>
+      <li><strong>Oracle Database Vault:</strong> Restricts access to source code views</li>
+      <li><strong>Third-Party Obfuscation Tools:</strong> Commercial products with stronger algorithms</li>
+      <li><strong>External Implementation:</strong> Move sensitive logic to compiled languages (Java, C)</li>
+    </ul>
+
+    <h2>Frequently Asked Questions</h2>
+    
+    <h4>Is wrapped PL/SQL completely secure?</h4>
+    <p>No. Wrapping is obfuscation, not encryption. Determined individuals with reverse-engineering skills can recover partial information. It's a deterrent, not absolute protection.</p>
+
+    <h4>Can I recover lost source code from wrapped files?</h4>
+    <p>Only partially. Always maintain backups of original source code. Wrapped code is not a substitute for version control.</p>
+
+    <h4>Does wrapping affect performance?</h4>
+    <p>No. Wrapped code compiles and executes identically to unwrapped code. The wrapping is only at the source level.</p>
+
+    <h4>Can I wrap triggers and type bodies?</h4>
+    <p>Yes. The wrap utility works on all PL/SQL program units including procedures, functions, packages, type bodies, and triggers.</p>
+
+    <h2>Conclusion</h2>
+    <p>Oracle's PL/SQL wrapping provides a basic level of source code protection. While not unbreakable, it serves as a practical deterrent against casual inspection. Use the UnwrapPLSQL tool to analyze wrapped code and understand what information might be exposed, but always maintain proper source control and consider additional security measures for truly sensitive logic.</p>
+  </article>
+</main>
+
+<footer class="border-t py-6 mt-12 text-center text-gray-600">
+  <p>© 2024 UnwrapPLSQL — Educational resource for Oracle PL/SQL developers</p>
+  <p class="mt-2"><a href="../index.html" class="text-blue-600">Try the Analyzer Tool →</a></p>
+</footer>
+</body>
+</html>
