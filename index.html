@@ -51,11 +51,14 @@
     <div class="bg-gray-900 rounded-xl border border-gray-800 p-6">
       <div class="mb-2 flex justify-between">
         <label class="text-sm text-gray-400">📥 Input</label>
-        <button onclick="pasteExample()" class="text-xs text-blue-400">✨ Try example</button>
+        <button onclick="pasteExample()" class="text-xs text-blue-400 hover:text-blue-300">✨ Try example</button>
       </div>
       <textarea id="input" class="w-full h-56 p-4 bg-gray-950 rounded-lg border border-gray-700 font-mono text-sm resize-y" placeholder="Paste wrapped PL/SQL..."></textarea>
       <div class="flex flex-wrap gap-3 mt-5">
-        <button onclick="analyze()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>Analyze</button>
+        <button onclick="analyze()" class="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-lg font-medium flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+          Analyze & Unwrap
+        </button>
         <button onclick="clearAll()" class="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded-lg font-medium">Clear</button>
         <button onclick="copyOutput()" class="bg-gray-700 hover:bg-gray-600 px-6 py-2.5 rounded-lg font-medium" id="copyBtn">Copy</button>
       </div>
@@ -79,12 +82,42 @@
   <p>© 2024 UnwrapPLSQL — For educational/recovery use only.</p>
   <div class="mt-3"><a href="seo/plsql-guide.html" class="hover:text-gray-300">📖 PL/SQL Unwrap Guide</a></div>
 </footer>
-<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
-<script>
-// Substitution table (same as before)
-const SUBSTITUTION_TABLE = new Uint8Array([0x3d,0x65,0x85,0xb3,0x18,0xdb,0xe2,0x87,0xf1,0x52,0xab,0x63,0x4b,0xb5,0xa0,0x5f,0x7c,0xca,0x6f,0x9b,0xd6,0xfe,0x26,0x34,0x0c,0x7e,0x3e,0x68,0x14,0xb6,0xbd,0x43,0xd2,0x32,0x1a,0x95,0x99,0x8b,0x9d,0x77,0x4f,0x29,0x07,0x8e,0xea,0x1c,0x90,0xba,0x01,0xf5,0x2b,0xf2,0x2e,0x8d,0x9e,0x1b,0x56,0x9f,0xe8,0xf7,0xcd,0x5d,0x49,0x05,0xc2,0xc6,0xeb,0x39,0x47,0xda,0x8a,0xd3,0x5b,0x3c,0x7b,0xb0,0x59,0x16,0x78,0x3f,0x35,0xbb,0x20,0x4e,0xa8,0x38,0x71,0x19,0x33,0x11,0x6e,0x9c,0xaf,0x55,0x10,0x6a,0xa3,0xa1,0x88,0x42,0x09,0x89,0x5c,0xde,0xb8,0x76,0xcb,0xbc,0x1f,0xbf,0x44,0xd7,0x3b,0xfc,0x2a,0xac,0xa7,0x40,0x15,0x24,0x28,0x51,0x7a,0x02,0x69,0xa9,0xc8,0xaa,0x8c,0xfa,0x86,0x0f,0x82,0xe0,0x22,0xd1,0x6d,0x2d,0x94,0xd5,0xc9,0x1d,0x00,0x66,0x92,0xe6,0x9a,0x6c,0x03,0xb9,0x4c,0x80,0x6b,0xef,0x06,0x67,0x13,0x0b,0xad,0x5a,0xc4,0xbe,0x0e,0x97,0x75,0x45,0x3a,0xdf,0x2f,0x21,0x41,0x04,0x12,0x83,0x91,0x23,0x4d,0x70,0x2c,0x30,0xf4,0x0a,0x54,0x7f,0xa2,0x27,0x8f,0xee,0x95,0xf8,0xed,0x5e,0xd8,0xb7,0xfb,0xe5,0xce,0xa6,0x31,0x79,0xb2,0x0d,0x1e,0xec,0x25,0x08,0xae,0xb1,0xc3,0x7d,0x50,0x4a,0x57,0x46,0x64,0x73,0xf3,0x36,0x81,0x48,0xe9,0x84,0xc1,0xe3,0xa5,0xcc,0xa4,0xe7,0xd0,0xc5,0xcf,0x58,0x17,0xff,0x96,0xf0,0xdd,0xd4,0xfd,0xe4,0xc7,0xf9,0x60,0x98,0x61,0x72,0x53,0x74,0xdc,0xf6,0xc0,0xb4,0x93,0xe1,0x62,0xd9]);
-const REVERSE_TABLE = (() => { const r = new Uint8Array(256); for (let i=0;i<256;i++) r[SUBSTITUTION_TABLE[i]] = i; return r; })();
 
+<!-- Pako for decompression -->
+<script src="https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js"></script>
+
+<script>
+// ============================================================
+// UNWRAPPLSQL - FULLY FIXED MULTI-SECTION UNWRAP
+// ============================================================
+
+// Oracle 10g+ substitution table (public domain)
+const SUBSTITUTION_TABLE = new Uint8Array([
+    0x3d,0x65,0x85,0xb3,0x18,0xdb,0xe2,0x87,0xf1,0x52,0xab,0x63,0x4b,0xb5,0xa0,0x5f,
+    0x7c,0xca,0x6f,0x9b,0xd6,0xfe,0x26,0x34,0x0c,0x7e,0x3e,0x68,0x14,0xb6,0xbd,0x43,
+    0xd2,0x32,0x1a,0x95,0x99,0x8b,0x9d,0x77,0x4f,0x29,0x07,0x8e,0xea,0x1c,0x90,0xba,
+    0x01,0xf5,0x2b,0xf2,0x2e,0x8d,0x9e,0x1b,0x56,0x9f,0xe8,0xf7,0xcd,0x5d,0x49,0x05,
+    0xc2,0xc6,0xeb,0x39,0x47,0xda,0x8a,0xd3,0x5b,0x3c,0x7b,0xb0,0x59,0x16,0x78,0x3f,
+    0x35,0xbb,0x20,0x4e,0xa8,0x38,0x71,0x19,0x33,0x11,0x6e,0x9c,0xaf,0x55,0x10,0x6a,
+    0xa3,0xa1,0x88,0x42,0x09,0x89,0x5c,0xde,0xb8,0x76,0xcb,0xbc,0x1f,0xbf,0x44,0xd7,
+    0x3b,0xfc,0x2a,0xac,0xa7,0x40,0x15,0x24,0x28,0x51,0x7a,0x02,0x69,0xa9,0xc8,0xaa,
+    0x8c,0xfa,0x86,0x0f,0x82,0xe0,0x22,0xd1,0x6d,0x2d,0x94,0xd5,0xc9,0x1d,0x00,0x66,
+    0x92,0xe6,0x9a,0x6c,0x03,0xb9,0x4c,0x80,0x6b,0xef,0x06,0x67,0x13,0x0b,0xad,0x5a,
+    0xc4,0xbe,0x0e,0x97,0x75,0x45,0x3a,0xdf,0x2f,0x21,0x41,0x04,0x12,0x83,0x91,0x23,
+    0x4d,0x70,0x2c,0x30,0xf4,0x0a,0x54,0x7f,0xa2,0x27,0x8f,0xee,0x95,0xf8,0xed,0x5e,
+    0xd8,0xb7,0xfb,0xe5,0xce,0xa6,0x31,0x79,0xb2,0x0d,0x1e,0xec,0x25,0x08,0xae,0xb1,
+    0xc3,0x7d,0x50,0x4a,0x57,0x46,0x64,0x73,0xf3,0x36,0x81,0x48,0xe9,0x84,0xc1,0xe3,
+    0xa5,0xcc,0xa4,0xe7,0xd0,0xc5,0xcf,0x58,0x17,0xff,0x96,0xf0,0xdd,0xd4,0xfd,0xe4,
+    0xc7,0xf9,0x60,0x98,0x61,0x72,0x53,0x74,0xdc,0xf6,0xc0,0xb4,0x93,0xe1,0x62,0xd9
+]);
+
+const REVERSE_TABLE = (() => {
+  const r = new Uint8Array(256);
+  for (let i = 0; i < 256; i++) r[SUBSTITUTION_TABLE[i]] = i;
+  return r;
+})();
+
+// Theme toggle
 let isDark = true;
 function toggleTheme() {
   isDark = !isDark;
@@ -92,9 +125,11 @@ function toggleTheme() {
   document.getElementById('themeToggle').innerHTML = isDark ? '☀️ Light' : '🌙 Dark';
 }
 
+// Detect wrapped PL/SQL
 function detectWrapped(input) {
   const lower = input.toLowerCase();
-  if (lower.includes('wrapped') || (lower.includes('wrap') && lower.includes('create')) || input.match(/^[A-Za-z0-9+/=\s]{100,}$/m) || input.match(/^\s*[0-9a-f]{1,4}\s+[0-9a-f]{1,4}\s*$/m)) {
+  if (lower.includes('wrapped') || (lower.includes('wrap') && lower.includes('create')) || 
+      input.match(/^[A-Za-z0-9+/=\s]{100,}$/m) || input.match(/^\s*[0-9a-f]{1,4}\s+[0-9a-f]{1,4}\s*$/m)) {
     let ver = "Standard Wrap";
     if (input.includes('9i') || input.match(/^[0-9A-Fa-f]{100,}$/m)) ver = "Oracle 9i Wrap";
     else if (input.match(/^[A-Za-z0-9+/=]{200,}$/m) || input.match(/^\s*[0-9a-f]{1,4}\s+[0-9a-f]{1,4}\s*$/m)) ver = "Oracle 10g+ Wrap";
@@ -103,93 +138,233 @@ function detectWrapped(input) {
   return { isWrapped: false, version: null };
 }
 
+// Extract clean Base64 from a wrapped section
+function extractBase64FromSection(section) {
+  const lines = section.split('\n');
+  let b64Chunks = [];
+  let inBody = false;
+  
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    
+    // Stop at the terminating '/' line
+    if (trimmed === '/') break;
+    
+    // Headers often contain hex numbers like "23f0 a60" or "abcd"
+    if (!inBody) {
+      // If the line looks like pure Base64 (only A-Za-z0-9+/=) and is long, we've hit the body
+      if (/^[A-Za-z0-9+/=]+$/.test(trimmed) && trimmed.length > 30) {
+        inBody = true;
+        b64Chunks.push(trimmed);
+      }
+      // Also check for lines that are mostly Base64 but might have spaces (rare)
+      else if (trimmed.replace(/\s/g, '').match(/^[A-Za-z0-9+/=]+$/) && trimmed.replace(/\s/g, '').length > 30) {
+        inBody = true;
+        b64Chunks.push(trimmed.replace(/\s/g, ''));
+      }
+      // Otherwise it's still header, skip
+    } else {
+      // We are inside the Base64 body
+      // Some wrapped code has line breaks inside Base64; just collect all characters.
+      const cleaned = trimmed.replace(/\s/g, '');
+      if (cleaned) b64Chunks.push(cleaned);
+    }
+  }
+  
+  return b64Chunks.join('');
+}
+
+// Main unwrap function for 10g+
 function unwrapOracle10gPlus(wrappedText) {
   console.log('🔍 Starting multi-section unwrap...');
+  
+  // Split on lines that are just '/' (with possible whitespace)
   const sections = wrappedText.split(/^\s*\/\s*$/m);
   console.log(`📦 Found ${sections.length} potential sections`);
+  
   const results = [];
+  
   for (let idx = 0; idx < sections.length; idx++) {
     const section = sections[idx];
     if (!section.trim()) continue;
-    if (!section.toLowerCase().includes('wrapped')) continue;
-    console.log(`\n📄 Processing section ${idx}...`);
-    const lines = section.split('\n');
-    let b64String = '';
-    let inBody = false;
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-      if (trimmed === '/') break;
-      if (!inBody) {
-        if (/^[A-Za-z0-9+/=]+$/.test(trimmed) && trimmed.length > 30) {
-          inBody = true;
-          console.log('✅ Base64 body started:', trimmed.substring(0,40)+'...');
-        } else continue;
-      }
-      if (inBody) b64String += trimmed;
+    if (!section.toLowerCase().includes('wrapped')) {
+      console.log(`⏭️ Section ${idx} does not contain 'wrapped', skipping`);
+      continue;
     }
-    if (!b64String) { console.warn(`⚠️ Section ${idx}: No Base64 body`); continue; }
+    
+    console.log(`\n📄 Processing section ${idx}...`);
+    const b64String = extractBase64FromSection(section);
+    
+    if (!b64String) {
+      console.warn(`⚠️ Section ${idx}: No Base64 body extracted`);
+      continue;
+    }
+    
     console.log(`📏 Section ${idx}: Base64 length = ${b64String.length}`);
+    
     try {
-      const binaryString = atob(b64String);
+      // Step 1: Base64 decode
+      let binaryString;
+      try {
+        binaryString = atob(b64String);
+      } catch (e) {
+        console.error(`❌ Base64 decode failed for section ${idx}:`, e.message);
+        // Try to clean the string (remove any non-Base64 chars just in case)
+        const cleaned = b64String.replace(/[^A-Za-z0-9+/=]/g, '');
+        binaryString = atob(cleaned);
+      }
+      
+      // Step 2: Convert to Uint8Array
       const rawBytes = new Uint8Array(binaryString.length);
-      for (let i=0;i<binaryString.length;i++) rawBytes[i] = binaryString.charCodeAt(i);
-      for (let i=0;i<rawBytes.length;i++) rawBytes[i] = REVERSE_TABLE[rawBytes[i]];
-      if (rawBytes.length <= 20) throw new Error('Data too short');
-      const decompressed = pako.inflate(rawBytes.slice(20), { to: 'string' });
-      console.log(`🎉 Section ${idx} unwrapped! (${decompressed.length} chars)`);
+      for (let i = 0; i < binaryString.length; i++) {
+        rawBytes[i] = binaryString.charCodeAt(i);
+      }
+      
+      // Step 3: Apply reverse substitution
+      for (let i = 0; i < rawBytes.length; i++) {
+        rawBytes[i] = REVERSE_TABLE[rawBytes[i]];
+      }
+      
+      // Step 4: Skip the first 20 bytes (SHA-1 hash)
+      if (rawBytes.length <= 20) {
+        throw new Error('Data too short (no SHA-1 hash)');
+      }
+      const compressedData = rawBytes.slice(20);
+      
+      // Step 5: LZ decompression with Pako
+      let decompressed;
+      try {
+        decompressed = pako.inflate(compressedData, { to: 'string' });
+      } catch (e) {
+        console.error(`❌ Decompression failed for section ${idx}:`, e.message);
+        // Some Oracle versions use raw deflate without zlib header; try raw inflate
+        try {
+          decompressed = pako.inflateRaw(compressedData, { to: 'string' });
+        } catch (e2) {
+          throw new Error(`Decompression error: ${e2.message}`);
+        }
+      }
+      
+      console.log(`🎉 Section ${idx} successfully unwrapped! (${decompressed.length} chars)`);
       results.push(`/* ===== Unwrapped Section ${idx+1} ===== */\n${decompressed}`);
-    } catch(e) { console.error(`❌ Section ${idx} error:`, e.message); }
+      
+    } catch (e) {
+      console.error(`❌ Section ${idx} error:`, e.message);
+      // Optionally, we could push the raw Base64 as fallback, but we skip for now
+    }
   }
-  if (results.length === 0) throw new Error('No valid wrapped sections found');
+  
+  if (results.length === 0) {
+    throw new Error('No valid wrapped sections found');
+  }
+  
   return results.join('\n\n');
 }
 
+// Fallback: simple Base64 decode (for partial recovery)
+function fallbackBase64Decode(input) {
+  const b64 = input.replace(/[^A-Za-z0-9+/=]/g, '');
+  try {
+    return atob(b64);
+  } catch (e) {
+    return null;
+  }
+}
+
+// UI functions
 function analyze() {
   const input = document.getElementById('input').value.trim();
-  if (!input) { setOutput('⚠ Please paste code'); resetStats(); return; }
+  if (!input) {
+    setOutput('⚠ Please paste wrapped PL/SQL code.');
+    resetStats();
+    return;
+  }
+  
   document.getElementById('output').value = '🔍 Analyzing...';
-  setTimeout(() => performAnalysis(input), 50);
+  document.getElementById('output').classList.add('analyzing');
+  
+  setTimeout(() => {
+    performAnalysis(input);
+    document.getElementById('output').classList.remove('analyzing');
+  }, 50);
 }
+
 function performAnalysis(input) {
   resetStats();
+  
   const det = detectWrapped(input);
-  if (!det.isWrapped) { setOutput('❌ Not a wrapped PL/SQL block'); document.getElementById('detect').innerText='Not Wrapped'; return; }
-  document.getElementById('detect').innerText='✓ Wrapped';
-  document.getElementById('wrapType').innerText=det.version||'Unknown';
-  let result='', strategy='', confidence='';
+  if (!det.isWrapped) {
+    setOutput('❌ Not a wrapped PL/SQL block.\n\nLook for: CREATE OR REPLACE ... wrapped');
+    document.getElementById('detect').innerText = 'Not Wrapped';
+    return;
+  }
+  
+  document.getElementById('detect').innerText = '✓ Wrapped';
+  document.getElementById('wrapType').innerText = det.version || 'Unknown';
+  
+  let result = '';
+  let strategy = '';
+  let confidence = '';
+  
+  // Try full 10g+ unwrap first
   try {
     result = unwrapOracle10gPlus(input);
     strategy = 'Full Unwrap (10g+)';
     confidence = 'High';
-  } catch(e) { console.warn('Full unwrap failed:', e.message); }
-  if (!result) {
-    try {
-      const cleaned = input.replace(/[^A-Za-z0-9+/=]/g,'');
-      const dec = atob(cleaned);
-      if (dec.length>10) { result = dec; strategy='Base64 Decode'; confidence='Medium'; }
-    } catch(e) {}
+  } catch (e) {
+    console.warn('Full unwrap failed:', e.message);
+    
+    // Fallback to simple Base64 decode
+    const fallback = fallbackBase64Decode(input);
+    if (fallback && fallback.length > 5) {
+      result = fallback;
+      strategy = 'Base64 Decode (Fragment)';
+      confidence = 'Low';
+    } else {
+      result = `⚠ Unable to unwrap.\n\nError: ${e.message}\n\nThis may be an Oracle 9i wrap (not fully supported) or the code is corrupted.`;
+      strategy = 'Failed';
+      confidence = 'None';
+    }
   }
+  
   if (result) {
-    setOutput(`/* Unwrapped with ${strategy} */\n${result}`);
-    document.getElementById('strategy').innerText=strategy;
-    document.getElementById('confidence').innerText=confidence;
+    setOutput(strategy === 'Full Unwrap (10g+)' ? result : `/* Partial Recovery (${strategy}) */\n${result}`);
+    document.getElementById('strategy').innerText = strategy;
+    document.getElementById('confidence').innerText = confidence;
   } else {
-    setOutput('⚠ Unable to unwrap. Check console (F12) for details.');
-    document.getElementById('strategy').innerText='None';
-    document.getElementById('confidence').innerText='Very Low';
+    setOutput('⚠ Unable to unwrap.');
+    document.getElementById('strategy').innerText = 'None';
+    document.getElementById('confidence').innerText = 'Very Low';
   }
 }
-function setOutput(t) { document.getElementById('output').value = t; }
-function resetStats() { ['detect','wrapType','strategy','confidence'].forEach(id=>document.getElementById(id).innerText='—'); }
-function clearAll() { document.getElementById('input').value=''; document.getElementById('output').value=''; resetStats(); }
+
+function setOutput(text) {
+  document.getElementById('output').value = text;
+}
+
+function resetStats() {
+  document.getElementById('detect').innerText = '—';
+  document.getElementById('wrapType').innerText = '—';
+  document.getElementById('strategy').innerText = '—';
+  document.getElementById('confidence').innerText = '—';
+}
+
+function clearAll() {
+  document.getElementById('input').value = '';
+  document.getElementById('output').value = '';
+  resetStats();
+}
+
 function copyOutput() {
   const out = document.getElementById('output');
-  out.select(); document.execCommand('copy');
+  out.select();
+  document.execCommand('copy');
   const btn = document.getElementById('copyBtn');
-  btn.innerHTML='✅ Copied!';
-  setTimeout(()=>btn.innerHTML='Copy',2000);
+  btn.innerHTML = '✅ Copied!';
+  setTimeout(() => btn.innerHTML = 'Copy', 2000);
 }
+
 function pasteExample() {
   document.getElementById('input').value = `CREATE OR REPLACE PROCEDURE hello_world wrapped 
 a000000
